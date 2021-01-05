@@ -8,14 +8,13 @@ module.exports = async function (context, req) {
     let response = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/`);
     const gitContents = await response.json();
 
-    context.log(gitContents);
-
     let templates = [];
 
     gitContents.filter(function (template) {
         if(template.type == "dir" && template.name != ".github"){
+            context.log(template.path);
             templates.push(template.path);
-            return 
+            return
         };
     });
 
