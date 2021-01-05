@@ -10,8 +10,11 @@ module.exports = async function (context, req) {
 
     context.log(gitContents);
 
-    const azuredeploy = await fetch(gitContents.download_url);
-    const azuredeployJson = await azuredeploy.json();
+    let buff = new Buffer(gitContents.content, 'base64');
+    let azuredeployJson = buff.toString('utf8');
+
+    //const azuredeploy = await fetch(gitContents.download_url);
+    //const azuredeployJson = await azuredeploy.json();
 
 
     context.res = {
