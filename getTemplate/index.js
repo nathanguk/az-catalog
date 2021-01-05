@@ -8,6 +8,8 @@ module.exports = async function (context, req) {
     const response = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${req.query.template}/azuredeploy.json`);
     const gitContents = await response.json();
 
+    context.log(gitContents);
+
     const azuredeploy = await fetch(gitContents.download_url);
     const azuredeployJson = await azuredeploy.json();
 
