@@ -5,7 +5,7 @@ module.exports = async function (context, req) {
     const account = process.env.GITHUB_ACCOUNT;
     const repo = process.env.GITHUB_REPO;
 
-    const response = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${req.query.template}/azuredeploy.json`);
+    const response = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${req.query.template}/azureDeploy.json`);
     const gitContents = await response.json();
 
     context.log(gitContents);
