@@ -11,7 +11,9 @@ module.exports = async function (context, req) {
     context.log(gitContents);
 
     let templates = gitContents.filter(function (template) {
-        return template.type == "dir"
+        if(template.type == "dir" && template.name != ".github"){
+            return template.path;
+        };
     });
 
 
