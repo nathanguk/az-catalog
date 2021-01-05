@@ -1,7 +1,7 @@
 module.exports = async function (context, req) {
 
-    const values = JSON.parse(req.body).values;
-    context.log(values);
+    const values = req.body.values;
+    context.log(values.template);
 
     const account = process.env.GITHUB_ACCOUNT;
     const repo = process.env.GITHUB_REPO;
@@ -13,4 +13,5 @@ module.exports = async function (context, req) {
     context.res = {
         status: 302, headers: { "location": location }
     };
-}
+
+};
