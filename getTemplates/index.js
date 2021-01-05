@@ -10,9 +10,12 @@ module.exports = async function (context, req) {
 
     context.log(gitContents);
 
-    let templates = gitContents.filter(function (template) {
+    let templates = [];
+
+    gitContents.filter(function (template) {
         if(template.type == "dir" && template.name != ".github"){
-            return template.path;
+            templates.push(template.path);
+            return 
         };
     });
 
