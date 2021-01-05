@@ -1,25 +1,37 @@
 const fetch = require('node-fetch');
 
 module.exports = async function (context, req) {
-    context.log(req.query);
-    const account = process.env.GITHUB_ACCOUNT;
-    const repo = process.env.GITHUB_REPO;
 
-    const response = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${req.query.template}/azureDeploy.json`);
-    const gitContents = await response.json();
+    if(req.query && req.query.template){
 
-    context.log(gitContents);
+        try{
 
-    let azuredeployJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
+            const account = process.env.GITHUB_ACCOUNT;
+            const repo = process.env.GITHUB_REPO;
+        
+            const response = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${req.query.template}/azureDeploy.json`);
+            const gitContents = await response.json();
+        
+            const azuredeployJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
+        
+            context.res = {
+                status: 200,
+                body: azuredeployJson.parameters
+            };
+    
+        }catch(err){
+    
+            context.res = {
+                status: 500,
+                body: err.message
+            };     
+        };
 
-    context.log(azuredeployJson);
-
-    //const azuredeploy = await fetch(gitContents.download_url);
-    //const azuredeployJson = await azuredeploy.json();
-
-
-    context.res = {
-        status: 200,
-        body: azuredeployJson.parameters
+    }else{
+        context.res = {
+            status: 500,
+            body: "Template Must Be Specified"
+        }; 
     };
-}
+
+};
