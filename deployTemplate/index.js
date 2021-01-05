@@ -8,13 +8,14 @@ module.exports = async function (context, req) {
 
     let deployUri = "https://portal.azure.com/#create/Microsoft.Template/uri/";
     let templateUri = encodeURIComponent(`https://raw.githubusercontent.com/${account}/${repo}/master/${values.template}/azureDeploy.json`);
-    let location = deployUri + templateUri;
-
-    context.log(location);
+    //let location = deployUri + templateUri;
+    let response = {
+        location: deployUri + templateUri
+    }
 
     context.res = {
         status: 200, 
-        body: {location: location}
+        body: response
     };
 
 };
