@@ -13,7 +13,8 @@ module.exports = async function (context, req) {
     context.log(location);
 
     context.res = {
-        status: 302, headers: { "location": location }
+        status: 200, 
+        body: { "location": location }
     };
 
 };
