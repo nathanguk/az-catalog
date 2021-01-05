@@ -1,7 +1,7 @@
 module.exports = async function (context, req) {
 
     const values = req.body.values;
-    context.log(values.template);
+    context.log(values);
 
     const account = process.env.GITHUB_ACCOUNT;
     const repo = process.env.GITHUB_REPO;
