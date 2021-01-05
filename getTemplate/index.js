@@ -29,8 +29,8 @@ module.exports = async function (context, req) {
 
     }else{
         context.res = {
-            status: 500,
-            body: "Template Must Be Specified"
+            status: 400,
+            body: "Template must be specified"
         }; 
     };
 
