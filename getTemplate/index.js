@@ -10,8 +10,7 @@ module.exports = async function (context, req) {
 
     context.log(gitContents);
 
-    let buff = new Buffer(gitContents.content, 'base64');
-    let azuredeployJson = buff.toString('utf8');
+    let azuredeployJson = Buffer.from(gitContents.content, 'base64').toString('utf8');
 
     context.log(azuredeployJson);
 
