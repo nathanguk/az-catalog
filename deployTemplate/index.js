@@ -13,6 +13,8 @@ module.exports = async function (context, req) {
         const repo = process.env.GITHUB_REPO;
         const body = req.body;
 
+        context.log(JSON.stringify(body.parameters));
+
         // Get Template from Git and convert to JSON
         const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`);
         const gitContents = await gitResponse.json();
@@ -29,7 +31,7 @@ module.exports = async function (context, req) {
         });
         
         let blobUri = await uploadTemplate(context, storageAccount, storageKey, storageContainerName, JSON.stringify(templateJson));
-        context.log(blobUri);
+
 
         let templateUri = encodeURIComponent(blobUri);
         let deployUri = "https://portal.azure.com/#create/Microsoft.Template/uri/";
@@ -37,8 +39,6 @@ module.exports = async function (context, req) {
         let response = {
             location: deployUri + templateUri
         }
-
-        context.log(JSON.stringify(response));
 
         context.res = {
             status: 200, 
