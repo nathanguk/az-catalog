@@ -27,11 +27,10 @@ module.exports = async function (context, req) {
             templateJson.parameters[parameterName].allowedValues = [body.parameters[parameterName]]
             templateJson.parameters[parameterName].defaultValue = body.parameters[parameterName]
         });
-
-        let templateString = JSON.stringify(templateJson);
         
+
         try{
-            let blobUri = await uploadTemplate(storageAccount, storageKey, storageContainerName, JSON.stringify(templateJson));
+            let blobUri = await uploadTemplate(context, storageAccount, storageKey, storageContainerName, JSON.stringify(templateJson));
         }catch(err){
             context.log(`Error: ${err}`);
         };
@@ -63,25 +62,31 @@ module.exports = async function (context, req) {
 
 
 // Function to upload template to blob storage
-async function uploadTemplate(storageAccount, storageKey, storageContainerName, templateString){
+async function uploadTemplate(context, storageAccount, storageKey, storageContainerName, templateString){
 
     const sharedKeyCredential = new storage.StorageSharedKeyCredential(storageAccount,storageKey);
+    context.log(sharedKeyCredential);
 
     // Create the BlobServiceClient object which will be used to create a container client
     const blobServiceClient = new storage.BlobServiceClient(`https://${storageAccount}.blob.core.windows.net`, sharedKeyCredential);
+    context.log("1");
 
     // Get a reference to a container
     const containerClient = blobServiceClient.getContainerClient(storageContainerName);
+    context.log("2");
 
     // Create a unique name for the blob
     const blobName = `${uuidv4()}.json`;
+    context.log(blobName);
 
     // Get a block blob client
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+    context.log("3");
 
     // Upload data to the blob
     const data = templateString;
     await blockBlobClient.upload(data, data.length);
+    context.log("4");
 
     // Create SAS Token Options
     const sasOptions = {
@@ -94,6 +99,7 @@ async function uploadTemplate(storageAccount, storageKey, storageContainerName, 
 
     // Generate SAS Token
     const sasToken = storage.generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
+    context.log("5");
 
     return `${containerClient.getBlockBlobClient(blobName).url}?${sasToken}`;
 
