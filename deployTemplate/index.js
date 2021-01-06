@@ -16,8 +16,6 @@ module.exports = async function (context, req) {
         const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`);
         const gitContents = await gitResponse.json();
         const templateJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
-        
-        context.log(JSON.stringify(templateJson));
 
         // Get Parameters from Request Body
         let parameterNames = Object.keys(templateJson.parameters);
@@ -30,10 +28,7 @@ module.exports = async function (context, req) {
         });
 
         let templateString = JSON.stringify(templateJson);
-        context.log(templateString);
-
-        //let blobUri = await uploadTemplate(storageConnectionString, storageContainer, JSON.stringify(templateJson));
-        let blobUri = 'testBlobUri';
+        let blobUri = await uploadTemplate(storageConnectionString, storageContainer, JSON.stringify(templateJson));
 
         let templateUri = encodeURIComponent(blobUri);
         let deployUri = "https://portal.azure.com/#create/Microsoft.Template/uri/";
