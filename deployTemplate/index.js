@@ -10,7 +10,8 @@ module.exports = async function (context, req) {
         const storageContainer = process.env.AZURE_STORAGE_CONTAINER;
         const account = process.env.GITHUB_ACCOUNT;
         const repo = process.env.GITHUB_REPO;
-        
+        const body = req.body;
+
         // Get Template from Git and convert to JSON
         try{
             const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`);
