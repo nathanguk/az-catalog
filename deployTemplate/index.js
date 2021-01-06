@@ -9,6 +9,7 @@ module.exports = async function (context, req) {
         const account = process.env.GITHUB_ACCOUNT;
         const repo = process.env.GITHUB_REPO;
         const body = req.body;
+        console.log(body);
         
         // Get Template from Git and convert to JSON
         const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${req.query.template}/azureDeploy.json`);
@@ -17,6 +18,7 @@ module.exports = async function (context, req) {
 
         // Get Parameters from Request Body
         let parameterNames = Object.keys(templateJson);
+        console.log(parameterNames);
 
         // Update Template with Parameter Values
         parameterNames.forEach(parameterName => {
@@ -24,7 +26,12 @@ module.exports = async function (context, req) {
             templateJson[parameterName].defaultValue = body.parameters[parameterName]
         });
 
-        let templateUri = encodeURIComponent(uploadTemplate(storageConnectionString, templateJson));
+        let blobUri = uploadTemplate(storageConnectionString, templateJson);
+        console.log(blobUri);
+
+        let templateUri = encodeURIComponent(blobUri);
+        console.log(templateUri);
+
         let deployUri = "https://portal.azure.com/#create/Microsoft.Template/uri/";
 
         //let templateUri = encodeURIComponent(`https://raw.githubusercontent.com/${account}/${repo}/master/${body.template}/azureDeploy.json`);
