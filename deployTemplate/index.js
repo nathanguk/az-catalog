@@ -12,10 +12,14 @@ module.exports = async function (context, req) {
         const repo = process.env.GITHUB_REPO;
         
         // Get Template from Git and convert to JSON
-        const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`);
-        const gitContents = await gitResponse.json();
-        const templateJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
-        context.log(templateJson);
+        try{
+            const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`);
+            const gitContents = await gitResponse.json();
+            const templateJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
+            context.log(templateJson);
+        }catch(err){
+            context.log(`Error: ${err}`);
+        };
 
         // Get Parameters from Request Body
         let parameterNames = Object.keys(templateJson.parameters);
