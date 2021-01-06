@@ -28,15 +28,12 @@ module.exports = async function (context, req) {
             templateJson.parameters[parameterName].defaultValue = body.parameters[parameterName]
         });
         
-
-        try{
-            let blobUri = await uploadTemplate(context, storageAccount, storageKey, storageContainerName, JSON.stringify(templateJson));
-        }catch(err){
-            context.log(`Error: ${err}`);
-        };
-        
+        let blobUri = await uploadTemplate(context, storageAccount, storageKey, storageContainerName, JSON.stringify(templateJson));        
+        context.log(blobUri);
 
         let templateUri = encodeURIComponent(blobUri);
+        context.log(templateUri);
+
         let deployUri = "https://portal.azure.com/#create/Microsoft.Template/uri/";
 
         let response = {
@@ -101,6 +98,9 @@ async function uploadTemplate(context, storageAccount, storageKey, storageContai
     const sasToken = storage.generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
     context.log("5");
 
-    return `${containerClient.getBlockBlobClient(blobName).url}?${sasToken}`;
+    const blobUri = `${containerClient.getBlockBlobClient(blobName).url}?${sasToken}`;
+    context.log(blobUri);
+
+    return blobUri;
 
 };
