@@ -13,9 +13,13 @@ module.exports = async function (context, req) {
         const repo = process.env.GITHUB_REPO;
 
         // Get Template from Git and convert to JSON
-        const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`);
-        const gitContents = await gitResponse.json();
-        const templateJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
+        try{
+            const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`);
+            const gitContents = await gitResponse.json();
+            const templateJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
+        }catch(err){
+            context.log(`error: ${err}`);
+        };
 
         // Get Parameters from Request Body
         let parameterNames = Object.keys(templateJson.parameters);
@@ -26,7 +30,9 @@ module.exports = async function (context, req) {
             templateJson.parameters[parameterName].defaultValue = body.parameters[parameterName]
         });
         
-        let blobUri = await uploadTemplate(context, storageAccount, storageKey, storageContainerName, JSON.stringify(templateJson));        
+        let blobUri = await uploadTemplate(context, storageAccount, storageKey, storageContainerName, JSON.stringify(templateJson));
+        context.log(blobUri);
+
         let templateUri = encodeURIComponent(blobUri);
         let deployUri = "https://portal.azure.com/#create/Microsoft.Template/uri/";
 
@@ -58,7 +64,6 @@ module.exports = async function (context, req) {
 async function uploadTemplate(context, storageAccount, storageKey, storageContainerName, templateString){
 
     const sharedKeyCredential = new storage.StorageSharedKeyCredential(storageAccount,storageKey);
-    context.log(sharedKeyCredential);
 
     // Create the BlobServiceClient object which will be used to create a container client
     const blobServiceClient = new storage.BlobServiceClient(`https://${storageAccount}.blob.core.windows.net`, sharedKeyCredential);
@@ -68,6 +73,7 @@ async function uploadTemplate(context, storageAccount, storageKey, storageContai
 
     // Create a unique name for the blob
     const blobName = `${uuidv4()}.json`;
+    context.log(blobName);
 
     // Get a block blob client
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
