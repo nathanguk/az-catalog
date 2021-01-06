@@ -83,15 +83,10 @@ async function uploadTemplate(storageConnectionString, containerName, templateSt
     // Create SAS Token Options
     const sasOptions = {
         containerName: containerClient.containerName,
-        blobName: blobName
-    };
-
-    if (storedPolicyName == null) {
-        sasOptions.startsOn = new Date();
-        sasOptions.expiresOn = new Date(new Date().valueOf() + 3600 * 1000);
-        sasOptions.permissions = BlobSASPermissions.parse("r");
-    } else {
-        sasOptions.identifier = storedPolicyName;
+        blobName: blobName,
+        startsOn: new Date(),
+        expiresOn: new Date(new Date().valueOf() + 3600 * 1000),
+        permissions: BlobSASPermissions.parse("r")
     }
 
     // Generate SAS Token
