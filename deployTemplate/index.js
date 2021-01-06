@@ -65,10 +65,10 @@ module.exports = async function (context, req) {
 // Function to upload template to blob storage
 async function uploadTemplate(storageAccount, storageKey, storageContainerName, templateString){
 
-    let sharedKeyCredential = new storage.StorageSharedKeyCredential(storageAccount,storageKey);
+    const sharedKeyCredential = new storage.StorageSharedKeyCredential(storageAccount,storageKey);
 
     // Create the BlobServiceClient object which will be used to create a container client
-    const blobServiceClient = storage.BlobServiceClient(`https://${storageAccount}.blob.core.windows.net`, sharedKeyCredential);
+    const blobServiceClient = new storage.BlobServiceClient(`https://${storageAccount}.blob.core.windows.net`, sharedKeyCredential);
 
     // Get a reference to a container
     const containerClient = blobServiceClient.getContainerClient(storageContainerName);
