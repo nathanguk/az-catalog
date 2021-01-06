@@ -10,25 +10,22 @@ module.exports = async function (context, req) {
         const account = process.env.GITHUB_ACCOUNT;
         const repo = process.env.GITHUB_REPO;
         const body = req.body;
-        context.log(body.template);
         
         // Get Template from Git and convert to JSON
-        try{
-            const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`);
-            const gitContents = await gitResponse.json();
-            const templateJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
-        }catch(err){
-            context.log(`Error: ${err}`);
-        };
+        const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`);
+        const gitContents = await gitResponse.json();
+        const templateJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
+        context.log(templateJson);
+
 
         // Get Parameters from Request Body
-        let parameterNames = Object.keys(templateJson);
+        let parameterNames = Object.keys(templateJson.parameters);
         context.log(parameterNames);
 
         // Update Template with Parameter Values
         parameterNames.forEach(parameterName => {
-            templateJson[parameterName].allowedValues = [body.parameters[parameterName]]
-            templateJson[parameterName].defaultValue = body.parameters[parameterName]
+            templateJson.parameters[parameterName].allowedValues = [body.parameters[parameterName]]
+            templateJson.parameters[parameterName].defaultValue = body.parameters[parameterName]
         });
 
         let blobUri = uploadTemplate(storageConnectionString, templateJson);
