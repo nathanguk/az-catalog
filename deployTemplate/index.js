@@ -12,7 +12,7 @@ module.exports = async function (context, req) {
         context.log(body);
         
         // Get Template from Git and convert to JSON
-        const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${req.query.template}/azureDeploy.json`);
+        const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`);
         const gitContents = await gitResponse.json();
         const templateJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
 
