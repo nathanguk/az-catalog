@@ -17,7 +17,7 @@ module.exports = async function (context, req) {
             const gitContents = await gitResponse.json();
             const templateJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
         }catch(err){
-            console.log(`Error: ${err}`);
+            context.log(`Error: ${err}`);
         };
 
         // Get Parameters from Request Body
