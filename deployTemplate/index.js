@@ -76,12 +76,9 @@ async function uploadTemplate(storageConnectionString, containerName, templateSt
     // Get a block blob client
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-    context.log(`Uploading to Azure storage as blob: ${blobName}`);
-
     // Upload data to the blob
     const data = templateString;
     const uploadBlobResponse = await blockBlobClient.upload(data, data.length);
-    context.log(`Blob was uploaded successfully. requestId: ${uploadBlobResponse.requestId}`);
 
     // Create SAS Token Options
     const sasOptions = {
@@ -99,7 +96,6 @@ async function uploadTemplate(storageConnectionString, containerName, templateSt
 
     // Generate SAS Token
     const sasToken = generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
-    context.log(`SAS token for blob is: ${sasToken}`);
 
     return `${containerClient.getBlockBlobClient(blobName).url}?${sasToken}`;
 
