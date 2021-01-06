@@ -9,6 +9,8 @@
   "author": "Nathan Gaskill",
   "license": "ISC",
   "dependencies": {
-    "node-fetch": "^2.6.1"
+    "@azure/storage-blob": "^12.3.0",
+    "node-fetch": "^2.6.1",
+    "uuid": "^8.3.2"
   }
 }
