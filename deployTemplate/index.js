@@ -1,13 +1,14 @@
 const { v4: uuidv4 } = require('uuid');
 const fetch = require('node-fetch');
-const { BlobServiceClient } = require('@azure/storage-blob');
+const storage = require('@azure/storage-blob');
 
 module.exports = async function (context, req) {
 
     try{
 
-        const storageConnectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-        const storageContainer = process.env.AZURE_STORAGE_CONTAINER;
+        const storageAccount = process.env.AZURE_STORAGE_ACCOUNT;
+        const storageKey = process.env.AZURE_STORAGE_KEY;
+        const storageContainerName = process.env.AZURE_STORAGE_CONTAINER;
         const account = process.env.GITHUB_ACCOUNT;
         const repo = process.env.GITHUB_REPO;
         const body = req.body;
@@ -30,7 +31,7 @@ module.exports = async function (context, req) {
         let templateString = JSON.stringify(templateJson);
         
         try{
-            let blobUri = await uploadTemplate(storageConnectionString, storageContainer, JSON.stringify(templateJson));
+            let blobUri = await uploadTemplate(storageAccount, storageKey, storageContainerName, JSON.stringify(templateJson));
         }catch(err){
             context.log(`Error: ${err}`);
         };
@@ -62,13 +63,15 @@ module.exports = async function (context, req) {
 
 
 // Function to upload template to blob storage
-async function uploadTemplate(storageConnectionString, containerName, templateString){
+async function uploadTemplate(storageAccount, storageKey, storageContainerName, templateString){
+
+    let sharedKeyCredential = new storage.StorageSharedKeyCredential(storageAccount,storageKey);
 
     // Create the BlobServiceClient object which will be used to create a container client
-    const blobServiceClient = BlobServiceClient.fromConnectionString(storageConnectionString);
+    const blobServiceClient = storage.BlobServiceClient(`https://${storageAccount}.blob.core.windows.net`, sharedKeyCredential);
 
     // Get a reference to a container
-    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const containerClient = blobServiceClient.getContainerClient(storageContainerName);
 
     // Create a unique name for the blob
     const blobName = `${uuidv4()}.json`;
@@ -78,7 +81,7 @@ async function uploadTemplate(storageConnectionString, containerName, templateSt
 
     // Upload data to the blob
     const data = templateString;
-    const uploadBlobResponse = await blockBlobClient.upload(data, data.length);
+    await blockBlobClient.upload(data, data.length);
 
     // Create SAS Token Options
     const sasOptions = {
@@ -86,11 +89,11 @@ async function uploadTemplate(storageConnectionString, containerName, templateSt
         blobName: blobName,
         startsOn: new Date(),
         expiresOn: new Date(new Date().valueOf() + 3600 * 1000),
-        permissions: BlobSASPermissions.parse("r")
+        permissions: storage.BlobSASPermissions.parse("r")
     }
 
     // Generate SAS Token
-    const sasToken = generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
+    const sasToken = storage.generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
 
     return `${containerClient.getBlockBlobClient(blobName).url}?${sasToken}`;
 
