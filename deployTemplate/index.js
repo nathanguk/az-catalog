@@ -7,6 +7,7 @@ module.exports = async function (context, req) {
     try{
 
         const storageConnectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+        const storageContainer = process.env.AZURE_STORAGE_CONTAINER;
         const account = process.env.GITHUB_ACCOUNT;
         const repo = process.env.GITHUB_REPO;
         const body = req.body;
@@ -28,7 +29,7 @@ module.exports = async function (context, req) {
             templateJson.parameters[parameterName].defaultValue = body.parameters[parameterName]
         });
 
-        let blobUri = uploadTemplate(storageConnectionString, templateJson);
+        let blobUri = uploadTemplate(storageConnectionString, storageContainer, JSON.stringify(templateJson));
         context.log(blobUri);
 
         let templateUri = encodeURIComponent(blobUri);
@@ -59,7 +60,7 @@ module.exports = async function (context, req) {
 
 
 // Function to upload template to blob storage
-async function uploadTemplate(storageConnectionString, template){
+async function uploadTemplate(storageConnectionString, containerName, templateString){
 
     // Create the BlobServiceClient object which will be used to create a container client
     const blobServiceClient = BlobServiceClient.fromConnectionString(storageConnectionString);
@@ -76,7 +77,7 @@ async function uploadTemplate(storageConnectionString, template){
     context.log(`Uploading to Azure storage as blob: ${blobName}`);
 
     // Upload data to the blob
-    const data = template;
+    const data = templateString;
     const uploadBlobResponse = await blockBlobClient.upload(data, data.length);
     context.log(`Blob was uploaded successfully. requestId: ${uploadBlobResponse.requestId}`);
 
