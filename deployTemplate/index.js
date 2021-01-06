@@ -28,7 +28,13 @@ module.exports = async function (context, req) {
         });
 
         let templateString = JSON.stringify(templateJson);
-        let blobUri = await uploadTemplate(storageConnectionString, storageContainer, JSON.stringify(templateJson));
+        
+        try{
+            let blobUri = await uploadTemplate(storageConnectionString, storageContainer, JSON.stringify(templateJson));
+        }catch(err){
+            context.log(`Error: ${err}`);
+        };
+        
 
         let templateUri = encodeURIComponent(blobUri);
         let deployUri = "https://portal.azure.com/#create/Microsoft.Template/uri/";
