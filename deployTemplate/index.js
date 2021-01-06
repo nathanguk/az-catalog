@@ -13,17 +13,15 @@ module.exports = async function (context, req) {
         const body = req.body;
 
         // Get Template from Git and convert to JSON
-        try{
-            const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`);
-            const gitContents = await gitResponse.json();
-            const templateJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
-            context.log(templateJson);
-        }catch(err){
-            context.log(`Error: ${err}`);
-        };
+        const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`);
+        const gitContents = await gitResponse.json();
+        const templateJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
+        
+        context.log(JSON.stringify(templateJson));
 
         // Get Parameters from Request Body
         let parameterNames = Object.keys(templateJson.parameters);
+        context.log(parameterNames);
 
         // Update Template with Parameter Values
         parameterNames.forEach(parameterName => {
