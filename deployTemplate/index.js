@@ -11,15 +11,13 @@ module.exports = async function (context, req) {
         const storageContainerName = process.env.AZURE_STORAGE_CONTAINER;
         const account = process.env.GITHUB_ACCOUNT;
         const repo = process.env.GITHUB_REPO;
+        const body = req.body;
 
         // Get Template from Git and convert to JSON
-        try{
-            const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`);
-            const gitContents = await gitResponse.json();
-            const templateJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
-        }catch(err){
-            context.log(`error: ${err}`);
-        };
+        const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`);
+        const gitContents = await gitResponse.json();
+        const templateJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
+
 
         // Get Parameters from Request Body
         let parameterNames = Object.keys(templateJson.parameters);
@@ -53,7 +51,7 @@ module.exports = async function (context, req) {
 
         context.res = {
             status: 400, 
-            body: "Bad Request"
+            body: `Bad Request: ${err}`
         };
     };
 
