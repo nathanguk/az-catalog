@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
+const fetch = require('node-fetch');
 const { BlobServiceClient } = require('@azure/storage-blob');
 
 module.exports = async function (context, req) {
