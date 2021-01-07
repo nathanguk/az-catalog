@@ -1,21 +1,22 @@
 const { v4: uuidv4 } = require('uuid');
 const fetch = require('node-fetch');
 const storage = require('@azure/storage-blob');
+const storageAccount = process.env.AZURE_STORAGE_ACCOUNT;
+const storageKey = process.env.AZURE_STORAGE_KEY;
+const storageContainerName = process.env.AZURE_STORAGE_CONTAINER;
+const account = process.env.GITHUB_ACCOUNT;
+const repo = process.env.GITHUB_REPO;
+const gitHubUser = process.env.GITHUB_USER;
+const gitHubPat = process.env.GITHUB_PAT;
+const gitHubAuth = Buffer.from(`${gitHubUser}:${gitHubPat}`).toString("base64");
+
 
 module.exports = async function (context, req) {
 
     try{
-
-        const storageAccount = process.env.AZURE_STORAGE_ACCOUNT;
-        const storageKey = process.env.AZURE_STORAGE_KEY;
-        const storageContainerName = process.env.AZURE_STORAGE_CONTAINER;
-        const account = process.env.GITHUB_ACCOUNT;
-        const repo = process.env.GITHUB_REPO;
-        const gitHubUser = process.env.GITHUB_USER;
-        const gitHubPat = process.env.GITHUB_PAT;
-        const gitHubAuth = Buffer.from(`${gitHubUser}:${gitHubPat}`).toString("base64");
         const body = req.body;
 
+        // Log recived parameters
         context.log(JSON.stringify(body.parameters));
 
         // Get Template from Git and convert to JSON
@@ -27,10 +28,12 @@ module.exports = async function (context, req) {
         };
         const gitResponse = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${body.template}/azureDeploy.json`, options);
         const gitContents = await gitResponse.json();
+
+        // Convert base64 contents to JSON string
         const templateJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
 
 
-        // Get Parameters from Request Body
+        // Get Parameters from gitResponse Body
         let parameterNames = Object.keys(templateJson.parameters);
 
         // Update Template with Parameter Values
@@ -39,16 +42,19 @@ module.exports = async function (context, req) {
             templateJson.parameters[parameterName].defaultValue = body.parameters[parameterName]
         });
         
+        // Call Function to upload template to Azure Blob storage and generate Blob SAS Uri
         let blobUri = await uploadTemplate(context, storageAccount, storageKey, storageContainerName, JSON.stringify(templateJson));
 
-
+        // Url Encode Blobs SAS Uri
         let templateUri = encodeURIComponent(blobUri);
         let deployUri = "https://portal.azure.com/#create/Microsoft.Template/uri/";
 
+        // Genrate resonse object
         let response = {
             location: deployUri + templateUri
         }
 
+        // Return response
         context.res = {
             status: 200, 
             body: response

@@ -10,7 +10,7 @@ const gitHubAuth = Buffer.from(`${gitHubUser}:${gitHubPat}`).toString("base64");
 module.exports = async function (context, req) {
 
     try{
-
+        // Get folders from Git
         const options = {
             method: "GET",
             headers: {
@@ -21,6 +21,7 @@ module.exports = async function (context, req) {
         const response = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/`, options);
         const gitContents = await response.json();
     
+        // Filter out specified folders
         let templates = [];
     
         gitContents.filter(function (template) {
@@ -31,6 +32,7 @@ module.exports = async function (context, req) {
             };
         });
     
+        // Retunr response
         context.res = {
             status: 200,
             body: templates

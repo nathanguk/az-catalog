@@ -10,6 +10,7 @@ module.exports = async function (context, req) {
     if(req.query && req.query.template){
 
         try{
+            // Get Template from Git and convert to JSON
             const options = {
                 method: "GET",
                 headers: {
@@ -19,9 +20,11 @@ module.exports = async function (context, req) {
         
             const response = await fetch(`https://api.github.com/repos/${account}/${repo}/contents/${req.query.template}/azureDeploy.json`, options);
             const gitContents = await response.json();
-        
+            
+            // Convert base64 contents to JSON string
             const azuredeployJson = JSON.parse(Buffer.from(gitContents.content, 'base64').toString('utf8'));
         
+            // Return response
             context.res = {
                 status: 200,
                 body: azuredeployJson.parameters
