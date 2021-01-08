@@ -1,7 +1,23 @@
-# az-catalog
-AZ Service Catalog Mioddleware
+# AZ Service Catalog Middleware
 
 This repo contains Azure Functions written in Node.js, that act as middleware between GitHub and SPA.
+
+Upload the contents of this repository to an Azure function App and configure the Application settings detailed below.
+
+## Function Application Settings
+
+The below environment variable must be configured.
+
+AZURE_STORAGE_ACCOUNT (Azure Storage Account Name)
+AZURE_STORAGE_KEY (Azure Storage Account Name)
+AZURE_STORAGE_CONTAINER (Azure Storage Container to store generated templates)
+
+GITHUB_USER (GitHub User)
+GITHUB_PAT (GitHub Personal Access Token)
+
+GITHUB_ACCOUNT (GitHub Account containing templates)
+GITHUB_REPO (GitHub Repository containing templates)
+GITHUB_EXCLUDE (Comma seperated list of folder to exclude in the repository)
 
 ## getTemplates
 
