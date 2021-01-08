@@ -100,7 +100,7 @@ async function uploadTemplate(context, storageAccount, storageKey, storageContai
         containerName: containerClient.containerName,
         blobName: blobName,
         startsOn: new Date(),
-        expiresOn: new Date(new Date().valueOf() + 30 * 1000),
+        expiresOn: new Date(new Date().valueOf() + 5 * 60000), // Link Valid for 5 minutes (60000 Miliseconds = 1 Minute)
         permissions: storage.BlobSASPermissions.parse("r")
     }
 
