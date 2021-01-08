@@ -27,7 +27,16 @@ module.exports = async function (context, req) {
         gitContents.filter(function (template) {
             if(template.type == "dir" && !excludedFolders.includes(template.name)){
                 context.log(template.path);
-                templates.push(template.path);
+
+                let armViz = `http://armviz.io/#/?load=`
+                let rawUrl = encodeURIComponent(`https://raw.githubusercontent.com/${account}/${repo}/master/${template.path}/azureDeploy.json`)
+
+                templateObject = {
+                    name: template.path,
+                    visualize: armViz + rawUrl
+                }
+                
+                templates.push(templateObject);
                 return
             };
         });
